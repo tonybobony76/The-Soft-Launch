@@ -1,0 +1,47 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: black;
+}
+
+#bgVideo {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.5);
+}
+
+#layerA, #layerB {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+}
+
+#layerA {
+  background-image: url("media/imageA.jpg");
+}
+
+#layerB {
+  background-image: url("media/imageB.jpg");
+  opacity: 0;
+}
+
+#overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 4rem;
+  font-family: sans-serif;
+  text-shadow: 0 0 20px black;
+}
