@@ -2,31 +2,30 @@ const video = document.getElementById("bgVideo");
 const countdown = document.getElementById("countdown");
 
 const TOTAL_TIME = 6 * 60 * 60 * 1000;
-
-// 12 AM CST (UTC)
 const startTime = new Date("2026-06-26T06:00:00Z").getTime();
 
-let duration = null;
+let duration = 0;
 let ready = false;
 
-// FORCE FIRST FRAME VISIBILITY (prevents black screen)
+// Force first frame ASAP
 video.addEventListener("loadeddata", () => {
-  video.currentTime = 0.001;
+  try {
+    video.currentTime = 0;
+  } catch (e) {}
 });
 
-video.addEventListener("loadedmetadata", () => {
+// Wait until video is actually usable
+video.addEventListener("canplay", () => {
   duration = video.duration;
   ready = true;
 
-  video.play().catch(() => {
-    // autoplay can fail silently in some browsers
-  });
+  video.play().catch(() => {});
 });
 
 function update() {
   const now = Date.now();
 
-  if (!ready || !duration) {
+  if (!ready || !duration || !isFinite(duration)) {
     countdown.textContent = "Loading...";
     requestAnimationFrame(update);
     return;
@@ -34,7 +33,6 @@ function update() {
 
   const elapsed = now - startTime;
 
-  // before start
   if (elapsed < 0) {
     video.currentTime = 0;
     countdown.textContent = "Starting soon";
@@ -43,13 +41,12 @@ function update() {
   }
 
   let progress = elapsed / TOTAL_TIME;
-
   if (progress > 1) progress = 1;
 
-  // key fix: only set time when valid
   const targetTime = progress * duration;
 
-  if (isFinite(targetTime)) {
+  // IMPORTANT: throttle seeking (prevents black flicker)
+  if (Math.abs(video.currentTime - targetTime) > 0.2) {
     video.currentTime = targetTime;
   }
 
