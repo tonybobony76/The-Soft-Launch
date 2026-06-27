@@ -32,7 +32,6 @@ function update() {
     const elapsed = now - EVENT_START;
     const progress = Math.min(elapsed / EVENT_DURATION, 1);
 
-    // SIMPLE CLEAN TAKEOVER
     mask.style.opacity = 1 - progress;
 
     countdown.textContent = format(EVENT_DURATION - elapsed);
