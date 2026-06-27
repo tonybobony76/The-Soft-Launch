@@ -1,48 +1,20 @@
 const video = document.getElementById("bgVideo");
 const countdown = document.getElementById("countdown");
 
-// Midnight June 27, 2026 CDT (UTC-5)
+// 12:00 AM CDT June 27, 2026 (UTC)
 const EVENT_START = new Date("2026-06-27T05:00:00Z").getTime();
-
-// 6 hours
 const EVENT_DURATION = 6 * 60 * 60 * 1000;
+
+let started = false;
 
 function format(ms) {
     const total = Math.max(0, Math.floor(ms / 1000));
 
-    const d = Math.floor(total / 86400);
-    const h = Math.floor((total % 86400) / 3600);
+    const h = Math.floor(total / 3600);
     const m = Math.floor((total % 3600) / 60);
     const s = total % 60;
 
-    if (d > 0) {
-        return `${d}d ${h}h ${m}m ${s}s`;
-    }
-
     return `${h}h ${m}m ${s}s`;
-}
-
-function syncVideo() {
-    if (!video.duration || !isFinite(video.duration))
-        return;
-
-    const now = Date.now();
-
-    if (now < EVENT_START) {
-        if (Math.abs(video.currentTime) > 0.25)
-            video.currentTime = 0;
-
-        return;
-    }
-
-    const elapsed = now - EVENT_START;
-    const progress = Math.min(elapsed / EVENT_DURATION, 1);
-
-    const target = progress * video.duration;
-
-    if (Math.abs(video.currentTime - target) > 0.5) {
-        video.currentTime = target;
-    }
 }
 
 function updateCountdown() {
@@ -56,11 +28,37 @@ function updateCountdown() {
     }
 }
 
-video.addEventListener("loadedmetadata", () => {
+function tryStartVideo() {
+    if (started) return;
+    if (!video.duration || !isFinite(video.duration)) return;
+
+    const now = Date.now();
+
+    if (now < EVENT_START) {
+        video.pause();
+        video.currentTime = 0;
+        return;
+    }
+
+    started = true;
+
+    // VERY IMPORTANT:
+    // stretch video across full event duration
+    const speed = video.duration / (EVENT_DURATION / 1000);
+
+    video.playbackRate = speed;
+
     video.play().catch(() => {});
+}
+
+video.addEventListener("loadedmetadata", () => {
+    video.currentTime = 0;
+    video.pause();
 });
 
-setInterval(updateCountdown, 1000);
-setInterval(syncVideo, 1000);
+setInterval(() => {
+    updateCountdown();
+    tryStartVideo();
+}, 500);
 
 updateCountdown();
