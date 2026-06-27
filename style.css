@@ -1,37 +1,48 @@
 html, body {
     margin: 0;
-    width: 100%;
     height: 100%;
+    width: 100%;
     overflow: hidden;
     background: black;
 }
 
-/* FINAL IMAGE (underneath) */
-#base {
+#stage {
     position: fixed;
+    inset: 0;
+}
+
+/* BASE IMAGE (always sharp) */
+#stage::before {
+    content: "";
+    position: absolute;
     inset: 0;
 
     background-image: url("media/final.jpg");
-    background-size: cover;
+    background-repeat: no-repeat;
     background-position: center;
+
+    /* KEY FIX: prevents soft scaling */
+    background-size: contain;
+    background-color: black;
 }
 
-/* MASK IMAGE (starts fully visible, then fades out cleanly) */
+/* MASK LAYER */
 #mask {
-    position: fixed;
+    position: absolute;
     inset: 0;
 
     background-image: url("media/mask.png");
-    background-size: cover;
+    background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
+    background-color: black;
 
     opacity: 1;
-    transition: opacity 0.2s linear;
 }
 
 /* COUNTDOWN */
 #overlay {
-    position: fixed;
+    position: absolute;
     inset: 0;
 
     display: flex;
